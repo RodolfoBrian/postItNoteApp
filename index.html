@@ -10570,50 +10570,153 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			view: impl.view
 		});
 };
+var $author$project$Main$Colour = F4(
+	function (red, green, blue, alpha) {
+		return {alpha: alpha, blue: blue, green: green, red: red};
+	});
+var $author$project$Main$Position = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
+var $author$project$Main$PostIt = F4(
+	function (position, colour, note, id) {
+		return {colour: colour, id: id, note: note, position: position};
+	});
+var $author$project$Main$createPostIt = function (postit) {
+	var position = A2($author$project$Main$Position, 0, 0);
+	var colour = A4($author$project$Main$Colour, 255, 45, 45, 0.5);
+	return A4($author$project$Main$PostIt, position, colour, postit, 0);
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		return $author$project$Main$init;
+		switch (msg.$) {
+			case 'NoteInput':
+				var addTxt = msg.a;
+				return _Utils_update(
+					model,
+					{noteInput: addTxt});
+			case 'AddPostIt':
+				return _Utils_update(
+					model,
+					{
+						noteInput: '',
+						postIts: A2(
+							$elm$core$List$cons,
+							$author$project$Main$createPostIt(model.noteInput),
+							model.postIts)
+					});
+			default:
+				return model;
+		}
 	});
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Main$postToDiv = function (note) {
+	var y = $elm$core$String$fromInt(note.position.y) + 'px';
+	var x = $elm$core$String$fromInt(note.position.x) + 'px';
+	var rgba = 'rgba(' + ($elm$core$String$fromInt(note.colour.red) + (',' + ($elm$core$String$fromInt(note.colour.green) + (',' + ($elm$core$String$fromInt(note.colour.blue) + (',' + ($elm$core$String$fromFloat(note.colour.alpha) + ')')))))));
+	var _v0 = A2($elm$core$Debug$log, 'Anything...', rgba);
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+				A2($elm$html$Html$Attributes$style, 'baground-color', rgba),
+				A2($elm$html$Html$Attributes$style, 'left', x),
+				A2($elm$html$Html$Attributes$style, 'top', y),
+				$elm$html$Html$Attributes$id(
+				$elm$core$String$fromInt(note.id))
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text(note.note)
+			]));
+};
+var $author$project$Main$postItBoard = function (notes) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'width', '500px'),
+				A2($elm$html$Html$Attributes$style, 'height', '500px'),
+				A2($elm$html$Html$Attributes$style, 'margin', '25px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '25px'),
+				A2($elm$html$Html$Attributes$style, 'background-color', '#ffffff')
+			]),
+		A2($elm$core$List$map, $author$project$Main$postToDiv, notes));
+};
+var $author$project$Main$AddPostIt = {$: 'AddPostIt'};
+var $author$project$Main$NoteInput = function (a) {
+	return {$: 'NoteInput', a: a};
+};
+var $author$project$Main$buttonStyle = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'width', '300px'),
+		A2($elm$html$Html$Attributes$style, 'background-color', '#397cd5'),
+		A2($elm$html$Html$Attributes$style, 'color', 'yellow'),
+		A2($elm$html$Html$Attributes$style, 'padding', '14px 20px'),
+		A2($elm$html$Html$Attributes$style, 'margin-top', '10px'),
+		A2($elm$html$Html$Attributes$style, 'border', 'none'),
+		A2($elm$html$Html$Attributes$style, 'border-radius', '4px'),
+		A2($elm$html$Html$Attributes$style, 'font-size', '16px')
+	]);
 var $elm$html$Html$form = _VirtualDom_node('form');
-var $author$project$Main$postItForm = A2(
-	$elm$html$Html$form,
-	_List_Nil,
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$input,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$type_('text')
-				]),
-			_List_Nil),
-			A2(
-			$elm$html$Html$button,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$type_('submit')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Add postit')
-				]))
-		]));
+var $author$project$Main$inputStyle = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'width', '300px'),
+		A2($elm$html$Html$Attributes$style, 'padding', '14px 20px'),
+		A2($elm$html$Html$Attributes$style, 'margin', '10px'),
+		A2($elm$html$Html$Attributes$style, 'font-size', '16px')
+	]);
+var $author$project$Main$postItForm = function (model) {
+	return A2(
+		$elm$html$Html$form,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$input,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('text'),
+							$elm$html$Html$Attributes$value(model.noteInput),
+							$elm$html$Html$Events$onInput($author$project$Main$NoteInput)
+						]),
+					$author$project$Main$inputStyle),
+				_List_Nil),
+				A2(
+				$elm$html$Html$a,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$elm$html$Html$Events$onClick($author$project$Main$AddPostIt)
+						]),
+					$author$project$Main$buttonStyle),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Add Post It')
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'background-color', 'green'),
+				A2($elm$html$Html$Attributes$style, 'background-color', '#232323'),
 				A2($elm$html$Html$Attributes$style, 'min-width', '100vw'),
 				A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
 			]),
 		_List_fromArray(
-			[$author$project$Main$postItForm]));
+			[
+				$author$project$Main$postItForm(model),
+				$author$project$Main$postItBoard(model.postIts)
+			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$sandbox(
 	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Main.Position":{"args":[],"type":"{ x : Basics.Int, y : Basics.Int }"}},"unions":{"Main.Msg":{"args":[],"tags":{"AddPostIt":["String.String"],"Move":["Main.Position"],"Delete":["Basics.Int"],"Edit":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Main.Position":{"args":[],"type":"{ x : Basics.Int, y : Basics.Int }"}},"unions":{"Main.Msg":{"args":[],"tags":{"AddPostIt":[],"Move":["Main.Position"],"Delete":["Basics.Int"],"Edit":[],"NoteInput":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
 
   var app = Elm.Main.init({ node: document.getElementById("elm") });
 }
